@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id                     String    @id @default(cuid())
+  name                   String
+  slug                   String    @unique
+  email                  String    @unique
+  phone                  String?
+  whatsappNumber         String    @default("+1234567890")
+  description            String?
+  logoUrl                String?
+  address                String?
+  currency               String    @default("USD")
+  deliveryFee            Float     @default(2.50)
+  minOrder               Float     @default(5.00)
+  isOpen                 Boolean   @default(true)
+  estimatedMinutes       Int       @default(25)
+  plan                   String    @default("FREE") // "FREE" | "PRO" | "CHAIN"
+  stripeCustomerId       String?
+  stripeSubscriptionId   String?
+  stripeCurrentPeriodEnd DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  categories Category[]
+  products   Product[]
+  orders     Order[]
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  icon         String?    @default("Utensils")
+  order        Int        @default(0)
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id           String        @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  categoryId   String
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  price        Float
+  imageUrl     String?
+  badge        String?       // "MÁS VENDIDO", "NUEVO", "COMBO TOP", "PROMO"
+  isAvailable  Boolean       @default(true)
+  prepTime     Int           @default(12) // Minutos en cocina
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  modifierGroups ModifierGroup[]
+  orderItems     OrderItem[]
+}
+
+model ModifierGroup {
+  id        String           @id @default(cuid())
+  productId String
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String           // Ej: "Personaliza tu carne", "Extras Crujientes", "Bebida del Combo"
+  required  Boolean          @default(false)
+  minSelect Int              @default(0)
+  maxSelect Int              @default(1)
+  options   ModifierOption[]
+}
+
+model ModifierOption {
+  id              String        @id @default(cuid())
+  modifierGroupId String
+  modifierGroup   ModifierGroup @relation(fields: [modifierGroupId], references: [id], onDelete: Cascade)
+  name            String        // Ej: "Extra Tocino Ahumado", "Doble Cheddar Fundido"
+  price           Float         @default(0.0)
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  restaurantId    String
+  restaurant      Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderNumber     Int         // Consecutivo #101, #102...
+  type            String      @default("DELIVERY") // "DELIVERY" | "TAKEAWAY" | "DINE_IN"
+  tableNumber     String?     // Número de mesa si es DINE_IN
+  customerName    String
+  customerPhone   String
+  customerAddress String?     // Dirección de entrega
+  customerNotes   String?     // Instrucciones de entrega o preparación
+  subtotal        Float
+  deliveryFee     Float       @default(0.0)
+  total           Float
+  status          String      @default("PENDING") // "PENDING", "PREPARING", "READY", "DELIVERED", "CANCELLED"
+  paymentMethod   String      @default("CASH") // "CASH", "CARD", "TRANSFER", "WHATSAPP"
+  paymentStatus   String      @default("PENDING") // "PENDING", "PAID"
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id                  String   @id @default(cuid())
+  orderId             String
+  order               Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId           String
+  product             Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productName         String
+  quantity            Int      @default(1)
+  unitPrice           Float
+  totalPrice          Float
+  selectedModifiers   String?  // Formato JSON string de modificadores elegidos
+  specialInstructions String?  // "Sin pepinillos, carne 3/4"
+}
