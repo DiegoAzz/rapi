@@ -15,11 +15,21 @@ import {
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
+import { getSession } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ slug?: string }>;
+}) {
+  const session = await getSession();
+  const params = await searchParams;
+  const targetSlug = params.slug || session?.slug || "fuego-burger";
+
   const restaurant = await prisma.restaurant.findUnique({
-    where: { slug: "fuego-burger" },
+    where: { slug: targetSlug },
     include: {
       orders: {
         include: { items: true },
@@ -32,7 +42,7 @@ export default async function DashboardPage() {
   if (!restaurant) {
     return (
       <div className="p-8 text-center text-slate-400">
-        No se encontró el restaurante demo. Ejecuta el seed para inicializarlo.
+        No se encontró el restaurante. Por favor inicia sesión o crea uno nuevo en /registro.
       </div>
     );
   }

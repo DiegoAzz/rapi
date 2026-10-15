@@ -64,6 +64,8 @@ interface Restaurant {
   address: string | null;
   phone: string | null;
   whatsappNumber: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
   currency: string;
   deliveryFee: number;
   minOrder: number;
@@ -327,21 +329,47 @@ export default function MenuClientView({ restaurant }: { restaurant: Restaurant 
         </div>
       </div>
 
-      {/* Header del Restaurante */}
-      <div className="relative bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+      {/* Header del Restaurante con Banner y Logo personalizados */}
+      <div className="relative bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800 overflow-hidden">
+        {restaurant.bannerUrl && (
+          <div className="absolute inset-0 z-0 opacity-20">
+            <img
+              src={restaurant.bannerUrl}
+              alt={restaurant.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
+          </div>
+        )}
+
+        <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 relative z-10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-xl shadow-red-500/10 text-white font-black text-2xl">
-                🔥
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center shadow-xl shadow-red-500/10 text-white font-black text-2xl overflow-hidden shrink-0 border border-amber-500/30">
+                {restaurant.logoUrl ? (
+                  <img
+                    src={restaurant.logoUrl}
+                    alt={restaurant.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>🔥</span>
+                )}
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-2xl font-black text-white">{restaurant.name}</h1>
-                  <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Abierto
-                  </span>
+                  {restaurant.isOpen ? (
+                    <span className="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-emerald-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Abierto
+                    </span>
+                  ) : (
+                    <span className="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-red-500/30">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                      Cerrado
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-slate-400 mt-0.5">{restaurant.description}</p>
                 <div className="flex items-center gap-4 mt-2 text-xs text-slate-300">

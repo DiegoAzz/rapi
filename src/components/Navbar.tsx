@@ -53,17 +53,17 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           <Link
-            href="/dashboard"
-            className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-900 transition-all"
+            href="/login"
+            className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-900 transition-all"
           >
             Iniciar Sesión
           </Link>
           <Link
-            href="/menu/fuego-burger"
-            className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02]"
+            href="/registro"
+            className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-600 hover:to-red-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-md shadow-amber-500/20 transition-all hover:scale-[1.02]"
           >
-            Demo en Vivo
-            <ChevronRight className="w-4 h-4" />
+            Crear mi Restaurante
+            <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

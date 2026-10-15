@@ -129,6 +129,36 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Actualizar o crear registro del cliente para el directorio y fidelización
+    try {
+      await prisma.customer.upsert({
+        where: {
+          restaurantId_phone: {
+            restaurantId: restaurant.id,
+            phone: customerPhone.trim(),
+          },
+        },
+        create: {
+          restaurantId: restaurant.id,
+          name: customerName.trim(),
+          phone: customerPhone.trim(),
+          address: customerAddress || null,
+          totalOrders: 1,
+          totalSpent: total,
+          lastOrderAt: new Date(),
+        },
+        update: {
+          name: customerName.trim(),
+          address: customerAddress || undefined,
+          totalOrders: { increment: 1 },
+          totalSpent: { increment: total },
+          lastOrderAt: new Date(),
+        },
+      });
+    } catch (custErr) {
+      console.warn("Aviso al registrar cliente:", custErr);
+    }
+
     return NextResponse.json({ success: true, order: newOrder }, { status: 201 });
   } catch (error) {
     console.error("Error al crear pedido:", error);

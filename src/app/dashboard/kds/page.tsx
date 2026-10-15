@@ -57,7 +57,11 @@ export default function KitchenDisplaySystemPage() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch("/api/orders?slug=fuego-burger");
+      const slug =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("slug") || "fuego-burger"
+          : "fuego-burger";
+      const res = await fetch(`/api/orders?slug=${encodeURIComponent(slug)}`);
       const data = await res.json();
       if (data.success && data.orders) {
         setOrders(data.orders);

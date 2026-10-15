@@ -12,10 +12,12 @@ model Restaurant {
   name                   String
   slug                   String    @unique
   email                  String    @unique
+  password               String?
   phone                  String?
   whatsappNumber         String    @default("+1234567890")
   description            String?
   logoUrl                String?
+  bannerUrl              String?
   address                String?
   currency               String    @default("USD")
   deliveryFee            Float     @default(2.50)
@@ -32,6 +34,7 @@ model Restaurant {
   categories Category[]
   products   Product[]
   orders     Order[]
+  customers  Customer[]
 }
 
 model Category {
@@ -122,4 +125,20 @@ model OrderItem {
   totalPrice          Float
   selectedModifiers   String?  // Formato JSON string de modificadores elegidos
   specialInstructions String?  // "Sin pepinillos, carne 3/4"
+}
+
+model Customer {
+  id           String      @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String
+  address      String?
+  totalOrders  Int         @default(1)
+  totalSpent   Float       @default(0)
+  lastOrderAt  DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([restaurantId, phone])
 }
